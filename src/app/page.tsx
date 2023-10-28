@@ -1,113 +1,202 @@
-import Image from 'next/image'
+"use client";
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.css";
+import { cities } from "./Cities";
+import { fetchWeatherData } from "./Backend/Api";
+import Image from "next/image";
+
+function shuffleArray(array: any) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array; // Gib das gemischte Array zurück
+}
+
+// Mische die Städte auf dem Client
+shuffleArray(cities);
+
+const fahrenheitToCelsius = (fahrenheit: number) => {
+  return (((fahrenheit - 32) * 5) / 9).toFixed(2);
+};
 
 export default function Home() {
+  const [visibleCityIndex, setVisibleCityIndex] = useState(0);
+  const [weatherData, setWeatherData] = useState<any>({});
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (visibleCityIndex < cities.length - 1) {
+        setVisibleCityIndex(visibleCityIndex + 1);
+        setWeatherData({}); // Zurücksetzen der Wetterdaten, wenn die Stadt gewechselt wird
+      }
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [visibleCityIndex]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        backgroundImage: "url('https://littlevisuals.co/images/downtown.jpg')",
+        backgroundSize: "cover",
+      }}
+    >
+      <CardWithInput
+        initialCity={cities[visibleCityIndex]}
+        weatherData={weatherData}
+        setWeatherData={setWeatherData}
+      />
+    </div>
+  );
+}
+
+function CardWithInput({
+  initialCity,
+  weatherData,
+  setWeatherData,
+}: {
+  initialCity: string;
+  weatherData: any;
+  setWeatherData: any;
+}) {
+  const [inputValue, setInputValue] = useState(initialCity);
+  const [icon, setIcon] = useState(""); // Hinzugefügt, um das Icon zu speichern
+
+  useEffect(() => {
+    setInputValue(initialCity); // Update inputValue when initialCity changes
+  }, [initialCity]);
+
+  //   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     setInputValue(e.target.value);
+  //   };
+
+  useEffect(() => {
+    async function getWeather() {
+      if (!weatherData[initialCity]) {
+        const data = await fetchWeatherData(initialCity);
+
+        if (data) {
+          console.log("Erhaltene Daten:", data);
+
+          if (data.weather && data.weather.length > 0) {
+            const currentIcon = data.weather[0].icon;
+            // Führe hier weitere Aktionen mit "icon" durch
+            setIcon(currentIcon); // Icon setzen
+            console.log("Erhaltene icon:", icon);
+          } else {
+            // Hier kannst du auf den Fall reagieren, in dem weatherData.weather nicht korrekt definiert ist
+            console.log("weatherData.weather ist nicht definiert oder leer.");
+          }
+          setWeatherData({ ...weatherData, [initialCity]: data });
+        }
+      }
+    }
+    getWeather();
+  }, [initialCity, weatherData, setWeatherData, icon]);
+
+  return (
+    <div className="container">
+      <div className="row">
+        <div className="col-12 col-lg-6">
+          <h5 className="card-title">Weather for {initialCity}</h5>
+          <div className="input-group mb-3">
+            <input
+              type="text"
+              className="form-control"
+              value={inputValue}
+              // onChange={handleInputChange}
+              // placeholder=" "
             />
-          </a>
+          </div>
+        </div>
+        <div className="w-100 d-lg-none"></div>{" "}
+        {/* Spaltenumbruch auf kleinen Bildschirmen */}
+        <div className="col-12 col-lg-6 d-flex flex-column">
+          {weatherData[initialCity] &&
+          Object.keys(weatherData[initialCity]).length !== 0 &&
+          weatherData[initialCity].weather[0] ? (
+            <>
+              <div className="d-flex align-items-center mb-2">
+                <p className="ml-2">
+                  Weather in {weatherData[initialCity].name}:{" "}
+                  {weatherData[initialCity].weather[0].description}
+                </p>
+                <Image
+                  src={`http://openweathermap.org/img/wn/${icon}.png`}
+                  alt="/"
+                  width={100}
+                  height={100}
+                />
+              </div>
+              <div>
+                <p>
+                  Currently{" "}
+                  {fahrenheitToCelsius(weatherData[initialCity].main.temp)}{" "}
+                  &deg; C
+                </p>
+                {/* <p>
+              Temperature: {weatherData[initialCity].main.temp}
+              &deg; F
+            </p> */}
+                <p>Humidity: {weatherData[initialCity].main.humidity}%</p>
+                <p>
+                  Wind Direction: {weatherData[initialCity].wind.deg} Degrees
+                </p>
+                {/* Weitere Wetterinformationen */}
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
+    </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    // <div className="card">
+    // <h3 className="card-header">Weather-app</h3>
+    // <div className="card-body">
+    //   <h5 className="card-title">Weather for {initialCity}</h5>
+    //   <div className="input-group mb-3">
+    //     <input
+    //       type="text"
+    //       className="form-control"
+    //       value={inputValue}
+    //       onChange={handleInputChange}
+    //       placeholder=" "
+    //     />
+    //   </div>
+    // </div>
+    // {weatherData[initialCity] &&
+    // Object.keys(weatherData[initialCity]).length !== 0 ? (
+    //   <>
+    //     <div>
+    //       <p>
+    //         Weather in {weatherData[initialCity].name}:{" "}
+    //         {weatherData[initialCity].weather[0].description}
+    //       </p>
+    //     </div>
+    //     <div>
+    //       <p>Currently {weatherData[initialCity].main.temp} &deg; F</p>
+    //       <p>Temperature: {weatherData[initialCity].main.temp} &deg; F</p>
+    //       <p>Humidity: {weatherData[initialCity].main.humidity}%</p>
+    //       <p>Pressure: {weatherData[initialCity].main.pressure} hPa</p>
+    //       <p>
+    //         Minimum Temperature: {weatherData[initialCity].main.temp_min}{" "}
+    //         &deg; F
+    //       </p>
+    //       <p>
+    //         Maximum Temperature: {weatherData[initialCity].main.temp_max}{" "}
+    //         &deg; F
+    //       </p>
+    //       <p>Wind Speed: {weatherData[initialCity].wind.speed} m/s</p>
+    //       <p>Wind Direction: {weatherData[initialCity].wind.deg} Degrees</p>
+    //       <p>Visibility: {weatherData[initialCity].visibility} Meters</p>
+    //     </div>
+    //   </>
+    // ) : null}
+    // </div>
+  );
 }
