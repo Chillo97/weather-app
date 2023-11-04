@@ -154,49 +154,5 @@ function CardWithInput({
         </div>
       </div>
     </div>
-
-    // <div className="card">
-    // <h3 className="card-header">Weather-app</h3>
-    // <div className="card-body">
-    //   <h5 className="card-title">Weather for {initialCity}</h5>
-    //   <div className="input-group mb-3">
-    //     <input
-    //       type="text"
-    //       className="form-control"
-    //       value={inputValue}
-    //       onChange={handleInputChange}
-    //       placeholder=" "
-    //     />
-    //   </div>
-    // </div>
-    // {weatherData[initialCity] &&
-    // Object.keys(weatherData[initialCity]).length !== 0 ? (
-    //   <>
-    //     <div>
-    //       <p>
-    //         Weather in {weatherData[initialCity].name}:{" "}
-    //         {weatherData[initialCity].weather[0].description}
-    //       </p>
-    //     </div>
-    //     <div>
-    //       <p>Currently {weatherData[initialCity].main.temp} &deg; F</p>
-    //       <p>Temperature: {weatherData[initialCity].main.temp} &deg; F</p>
-    //       <p>Humidity: {weatherData[initialCity].main.humidity}%</p>
-    //       <p>Pressure: {weatherData[initialCity].main.pressure} hPa</p>
-    //       <p>
-    //         Minimum Temperature: {weatherData[initialCity].main.temp_min}{" "}
-    //         &deg; F
-    //       </p>
-    //       <p>
-    //         Maximum Temperature: {weatherData[initialCity].main.temp_max}{" "}
-    //         &deg; F
-    //       </p>
-    //       <p>Wind Speed: {weatherData[initialCity].wind.speed} m/s</p>
-    //       <p>Wind Direction: {weatherData[initialCity].wind.deg} Degrees</p>
-    //       <p>Visibility: {weatherData[initialCity].visibility} Meters</p>
-    //     </div>
-    //   </>
-    // ) : null}
-    // </div>
   );
 }
