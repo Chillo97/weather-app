@@ -16,10 +16,12 @@ function shuffleArray(array: any) {
 // Mische die Städte auf dem Client
 shuffleArray(cities);
 
+//fahrenheit to Celsius
 const fahrenheitToCelsius = (fahrenheit: number) => {
   return (((fahrenheit - 32) * 5) / 9).toFixed(2);
 };
 
+//Haupfunction Home
 export default function Home() {
   const [visibleCityIndex, setVisibleCityIndex] = useState(0);
   const [weatherData, setWeatherData] = useState<any>({});
@@ -46,34 +48,19 @@ export default function Home() {
         backgroundSize: "cover",
       }}
     >
-      <CardWithInput
-        initialCity={cities[visibleCityIndex]}
-        weatherData={weatherData}
-        setWeatherData={setWeatherData}
-      />
+      <CardWithInput initialCity={cities[visibleCityIndex]} weatherData={weatherData} setWeatherData={setWeatherData}/>
     </div>
   );
 }
 
-function CardWithInput({
-  initialCity,
-  weatherData,
-  setWeatherData,
-}: {
-  initialCity: string;
-  weatherData: any;
-  setWeatherData: any;
-}) {
+//Fuction with Wetterinformationen
+function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity: string; weatherData: any; setWeatherData: any;}) {
   const [inputValue, setInputValue] = useState(initialCity);
   const [icon, setIcon] = useState(""); // Hinzugefügt, um das Icon zu speichern
 
   useEffect(() => {
     setInputValue(initialCity); // Update inputValue when initialCity changes
   }, [initialCity]);
-
-  //   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     setInputValue(e.target.value);
-  //   };
 
   useEffect(() => {
     async function getWeather() {
@@ -105,13 +92,7 @@ function CardWithInput({
         <div className="col-12 col-lg-6">
           <h5 className="card-title">Weather for {initialCity}</h5>
           <div className="input-group mb-3">
-            <input
-              type="text"
-              className="form-control"
-              value={inputValue}
-              // onChange={handleInputChange}
-              // placeholder=" "
-            />
+            <input type="text" className="form-control" value={inputValue} />
           </div>
         </div>
         <div className="w-100 d-lg-none"></div>{" "}
