@@ -49,4 +49,5 @@ export const cities = [
   "Seoul",
   "Hong Kong",
   "Singapore",
+  "Mbouda",
 ];
