@@ -59,10 +59,6 @@ function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity
   const [icon, setIcon] = useState(""); // Hinzugefügt, um das Icon zu speichern
 
   useEffect(() => {
-    setInputValue(initialCity); // Update inputValue when initialCity changes
-  }, [initialCity]);
-
-  useEffect(() => {
     async function getWeather() {
       if (!weatherData[initialCity]) {
         const data = await fetchWeatherData(initialCity);
@@ -77,7 +73,6 @@ function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity
             console.log("Erhaltene icon:", icon);
           } else {
             // Hier kannst du auf den Fall reagieren, in dem weatherData.weather nicht korrekt definiert ist
-            console.log("weatherData.weather ist nicht definiert oder leer.");
           }
           setWeatherData({ ...weatherData, [initialCity]: data });
         }
@@ -85,6 +80,10 @@ function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity
     }
     getWeather();
   }, [initialCity, weatherData, setWeatherData, icon]);
+
+  useEffect(() => {
+    setInputValue(initialCity); // Update inputValue when initialCity changes
+  }, [initialCity]);
 
   return (
     <div className="container">
