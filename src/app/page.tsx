@@ -53,6 +53,9 @@ export default function Home() {
   );
 }
 
+
+
+
 //Fuction with Wetterinformationen
 function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity: string; weatherData: any; setWeatherData: any;}) {
   const [inputValue, setInputValue] = useState(initialCity);
