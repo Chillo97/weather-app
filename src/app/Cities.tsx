@@ -50,4 +50,8 @@ export const cities = [
   "Hong Kong",
   "Singapore",
   "Mbouda",
+  "Garoua",
+  "Bamenda",
+  "Buea",
+
 ];
