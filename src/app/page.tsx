@@ -53,7 +53,7 @@ export default function Home() {
   );
 }
 
-//Fuction with Wetterinformationen
+//Fuction with Wetterinformationenm  ödslvföfcvkvfcmfdvlkrnl
 function CardWithInput({initialCity, weatherData, setWeatherData,}: {initialCity: string; weatherData: any; setWeatherData: any;}) {
   const [inputValue, setInputValue] = useState(initialCity);
   const [icon, setIcon] = useState(""); // Hinzugefügt, um das Icon zu speichern
