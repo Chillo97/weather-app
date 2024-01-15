@@ -9,7 +9,7 @@ export async function fetchWeatherData(city: string) {
     if (data?.cod === "400") throw data;
     return data;
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return null;
   }
 }
