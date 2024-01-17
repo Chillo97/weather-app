@@ -53,5 +53,6 @@ export const cities = [
   "Garoua",
   "Bamenda",
   "Buea",
+  "Bertoua",
 
 ];
